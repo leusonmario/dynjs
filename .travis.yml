@@ -1,8 +1,27 @@
+
+sudo: required
 language: java
-install: mvn install -s support/settings.xml -DskipTests=true -P,-version
-script: mvn test -s support/settings.xml -P,-version
+
 jdk:
   - oraclejdk7
   - openjdk7
-notifications:
-  irc: "irc.freenode.org#dynjs"
+
+
+script:
+  - mvn clean cobertura:cobertura -Dtest=StackTraceTest#testComplexStack -DfailIfNoTests=false
+
+before_deploy:
+- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/dynjs/target/site/cobertura
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "fglUFncMJAvELRd2WL0yOK2GgR2teZTx2DaliOahffiYHyPI/XNLcnW6W4+tH8/LvsrH4ENU5cah1/pqnk4qwq0N951HHavgSQRYRp+Jm5VnS46Dx/8XF7/5RP95IUvfwzinp3rwFmeI+mn9SNNkVWPl3b1W3W9liQ3A0o7+ptJOmW6C4VC19qAO9ZDCLF3dpi4Jy2CWqPcv0b+NuVU8Y/Vocfq4FmAOY2J+YSWF8buY3tF9dxNteSPOw9mzZgXMzrjw1xr1YLxOUQYf4r+2vgAc7OMixm6n1+g50H81RULR9KZASs9nDHeXB+xUCcyjqp2mwF64PVhfS2HoOxhWq6dtSa8ZRNlFEUft00kJLFbUdynO3UaGznzYtFJUr0OHM+dhT4nsR8sUY8m/Ju4dImAW+wDEPJswuOFguhS9+0BKykPRDXQsL9koI73ibd6FtAmxWa9T2O9MGG+9yPSzxcWgvv9871BMw1hZ6+hoeHDhi/6x8ketv9x/JhD5Au/Nvqz2+G/dHsuugcO1mdY++P4Yrj+pVqXjZ4UBhWzl+76bhZ2DP8O2WQTZhSMSDYysdm/W9X7TKiD/BJj/igcxKkISB2H057UK3+v16bZhc84epFk4TM2lXezwBeTCy6kYNcCl1UD1rQhEYhFL6BrBzC5D6KdLmxAyJBmIcZSg4EQ="
+
+
+  file: coverage-result.tar.gz
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    tags: true
